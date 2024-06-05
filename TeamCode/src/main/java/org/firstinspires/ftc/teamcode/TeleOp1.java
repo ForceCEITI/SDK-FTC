@@ -21,7 +21,7 @@ public class TeleOp1 extends OpMode {
 
         leftMotor = hardwareMap.dcMotor.get("CH_motor0");
         rightMotor = hardwareMap.dcMotor.get("CH_motor1");
-        armMotor = hardwareMap.get(DcMotor.class, "CH_motor2");
+        armMotor = hardwareMap.dcMotor.get("CH_motor2");
 
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -29,6 +29,8 @@ public class TeleOp1 extends OpMode {
         leftServo = hardwareMap.get(Servo.class, "CH_servo0");
         rightServo = hardwareMap.get(Servo.class, "CH_servo1");
 
+        leftServo.setPosition(0.55);
+        rightServo.setPosition(0.65);
 
         telemetry.addLine("Hello, World!");
         telemetry.update();
@@ -37,14 +39,25 @@ public class TeleOp1 extends OpMode {
     @Override
     public void loop(){
 
-        // Left-right movement
-        double rotate = gamepad1.left_stick_x;
-
-        // Front-back movement
         double forward = -gamepad1.left_stick_y;
+        double direction = gamepad1.right_stick_x;
 
-        leftMotor.setPower(forward + rotate);
-        rightMotor.setPower(forward - rotate);
+        leftMotor.setPower(forward + direction);
+        rightMotor.setPower(forward - direction);
+
+
+
+        if(gamepad1.right_bumper){
+            leftServo.setPosition(0.55);
+            rightServo.setPosition(0.65);
+        }
+        if(gamepad1.left_bumper){
+            leftServo.setPosition(0.4);
+            rightServo.setPosition(0.7);
+        }
+
+
+        armMotor.setPower(gamepad1.left_stick_x);
 
         telemetry.addData("Time", getRuntime());
         telemetry.update();
