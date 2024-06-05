@@ -25,6 +25,8 @@ public class TeleOp1 extends OpMode {
 
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         leftServo = hardwareMap.get(Servo.class, "CH_servo0");
         rightServo = hardwareMap.get(Servo.class, "CH_servo1");
@@ -32,19 +34,27 @@ public class TeleOp1 extends OpMode {
         leftServo.setPosition(0.55);
         rightServo.setPosition(0.65);
 
-        telemetry.addLine("Hello, World!");
+        telemetry.addLine("Hello!");
         telemetry.update();
     }
 
     @Override
     public void loop(){
 
-        double forward = -gamepad1.left_stick_y;
-        double direction = gamepad1.right_stick_x;
+        double forward = -gamepad1.left_stick_y*0.5;
+        double direction = gamepad1.right_stick_x*0.5;
 
-        leftMotor.setPower(forward + direction);
-        rightMotor.setPower(forward - direction);
+        double forward_normal_speed = -gamepad1.left_stick_y;
+        double direction_normal_speed = gamepad1.right_stick_x;
 
+        if(gamepad1.a){
+            leftMotor.setPower(forward_normal_speed + direction_normal_speed);
+            rightMotor.setPower(forward_normal_speed - direction_normal_speed);
+        }
+        else{
+            leftMotor.setPower(forward + direction);
+            rightMotor.setPower(forward - direction);
+        }
 
 
         if(gamepad1.right_bumper){
@@ -52,12 +62,13 @@ public class TeleOp1 extends OpMode {
             rightServo.setPosition(0.65);
         }
         if(gamepad1.left_bumper){
-            leftServo.setPosition(0.4);
-            rightServo.setPosition(0.7);
+            leftServo.setPosition(0.45);
+            rightServo.setPosition(0.75);
         }
 
 
-        armMotor.setPower(gamepad1.left_stick_x);
+        armMotor.setPower(gamepad1.right_trigger);
+        armMotor.setPower(-gamepad1.left_trigger);
 
         telemetry.addData("Time", getRuntime());
         telemetry.update();
