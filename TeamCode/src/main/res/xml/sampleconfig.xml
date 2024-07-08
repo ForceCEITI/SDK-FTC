@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <Webcam name="Webcam 1" serialNumber="VendorProduct:vendor=0x046d|product=0x08e5|connection=" />
+
+    <LynxUsbDevice name="Expansion Hub Portal 1" serialNumber="DQ2FXPCC" parentModuleAddress="2">
+        <LynxModule name="Expansion Hub 2" port="2">
+            <LynxEmbeddedIMU name="imu 1" port="0" bus="0" />
+
+            <goBILDA5202SeriesMotor name="EH_motor0" port="0" />
+            <goBILDA5202SeriesMotor name="EH_motor1" port="1" />
+            <goBILDA5202SeriesMotor name="EH_motor2" port="2" />
+            <goBILDA5202SeriesMotor name="EH_motor3" port="3" />
+
+            <Servo name="EH_servo0" port="0" />
+            <Servo name="EH_servo1" port="1" />
+            <Servo name="EH_servo2" port="2" />
+            <Servo name="EH_servo3" port="3" />
+            <Servo name="EH_servo4" port="4" />
+            <Servo name="EH_servo5" port="5" />
+
+            <AnalogInput name="EH_analog0" port="0" />
+            <AnalogInput name="EH_analog1" port="1" />
+            <AnalogInput name="EH_analog2" port="2" />
+            <AnalogInput name="EH_analog3" port="3" />
+        </LynxModule>
+    </LynxUsbDevice>
+
+    <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
+        <LynxModule name="Control Hub" port="173">
+            <KauaiLabsNavxMicro name="navx" port="0" bus="0" />
+
+            <ControlHubImuBHI260AP name="imu" port="0" bus="1" />
+
+            <goBILDA5202SeriesMotor name="CH_motor0" port="0" />
+            <goBILDA5202SeriesMotor name="CH_motor1" port="1" />
+            <goBILDA5202SeriesMotor name="CH_motor2" port="2" />
+            <goBILDA5202SeriesMotor name="CH_motor3" port="3" />
+
+            <Servo name="CH_servo0" port="0" />
+            <Servo name="CH_servo1" port="1" />
+            <Servo name="CH_servo2" port="2" />
+            <Servo name="CH_servo3" port="3" />
+            <Servo name="CH_servo4" port="4" />
+            <Servo name="CH_servo5" port="5" />
+
+            <AnalogInput name="CH_analog0" port="0" />
+            <AnalogInput name="CH_analog1" port="1" />
+            <AnalogInput name="CH_analog2" port="2" />
+            <AnalogInput name="CH_analog3" port="3" />
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>

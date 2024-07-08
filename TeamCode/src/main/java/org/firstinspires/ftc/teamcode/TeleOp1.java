@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.sun.tools.javac.jvm.ByteCodes.error;
+
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.google.ar.core.Config;
@@ -8,9 +10,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Start")
+@TeleOp(name="123")
 public class TeleOp1 extends OpMode {
 
     DcMotor leftMotor;
@@ -19,15 +22,24 @@ public class TeleOp1 extends OpMode {
 
     Servo leftServo;
     Servo rightServo;
-    PIDController controller;
 
-    final double armPPR = 1425.1; //câte poziții are într-o rotație
-    double armTarget = 0 ;
-    public static double kG = 0.2;
+    double integralSum = 0.0;
+    ElapsedTime timer = new ElapsedTime();
 
-    //    public static double kP = 0, kI = 0, kD = 0;
-//    v private final double ticks_in_degree = 700 / 180.0;
+    public static double kP = 4, kI = 2, kD = 1;
+    void updateMotor(double reference, double state){
+        double error = reference - state;
+        integralSum += error * timer.seconds();
+        double derivative = error / timer.seconds();
 
+        double output = kP * error + kI * integralSum + kD * derivative;
+
+        timer.reset();
+        armMotor.setPower(output);
+    }
+
+    double multiplier = 0;
+    double reference = 0;
 
     @Override
     public void init() {
@@ -47,8 +59,6 @@ public class TeleOp1 extends OpMode {
         leftServo.setPosition(0.55);
         rightServo.setPosition(0.65);
 
-        controller = new PIDController(1, 1, 1);
-
 
         telemetry.addLine("Hello!");
         telemetry.update();
@@ -57,20 +67,11 @@ public class TeleOp1 extends OpMode {
     @Override
     public void loop(){
 
-        double forward = -gamepad1.left_stick_y*0.5;
-        double direction = gamepad1.right_stick_x*0.5;
-
         double forward_normal_speed = -gamepad1.left_stick_y;
         double direction_normal_speed = gamepad1.right_stick_x;
 
-        if(gamepad1.a){
-            leftMotor.setPower(forward_normal_speed + direction_normal_speed);
-            rightMotor.setPower(forward_normal_speed - direction_normal_speed);
-        }
-        else{
-            leftMotor.setPower(forward + direction);
-            rightMotor.setPower(forward - direction);
-        }
+        leftMotor.setPower(forward_normal_speed + direction_normal_speed);
+        rightMotor.setPower(forward_normal_speed - direction_normal_speed);
 
 
         if(gamepad1.right_bumper){
@@ -82,20 +83,34 @@ public class TeleOp1 extends OpMode {
             rightServo.setPosition(0.75);
         }
 
-        double currentAngle = armMotor.getCurrentPosition() * 2 * Math.PI / armPPR;
-        double armFeedForword = armMotor.getCurrentPosition() * kG * Math.cos(currentAngle);
-        armMotor.setPower(gamepad1.right_trigger + armFeedForword);
+
+        double lastError = 0;
+        kD = (error - lastError) / timer.seconds();
+        lastError = error;
 
 
+        if(gamepad1.circle){
+            multiplier = 50;
+        }
+        else {
+            multiplier = 10;
+        }
 
-//        controller.setPID(p,i, d);
-//        int armPos = armMotor.getCurrentPosition();
-//        double pid = controller.calculate(armPos, target);
-//        double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
-//        double power = pid + ff;
+        if(gamepad1.dpad_up){
+            reference += multiplier;
+        }
+        if(gamepad1.dpad_down){
+            reference -= multiplier;
+        }
 
 
-        telemetry.addData("Angle", Math.toDegrees(currentAngle));
+        if(gamepad1.cross){
+            reference = 0;
+        }
+
+        updateMotor(reference, armMotor.getCurrentPosition());
+
+
         telemetry.update();
     }
 }
