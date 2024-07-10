@@ -55,9 +55,9 @@ public class TeleOp1 extends OpMode {
 
         leftServo = hardwareMap.get(Servo.class, "CH_servo0");
         rightServo = hardwareMap.get(Servo.class, "CH_servo1");
-
-        leftServo.setPosition(0.55);
-        rightServo.setPosition(0.65);
+        //open possition
+        leftServo.setPosition(0.7);
+        rightServo.setPosition(-0.05);
 
 
         telemetry.addLine("Hello!");
@@ -73,15 +73,38 @@ public class TeleOp1 extends OpMode {
         leftMotor.setPower(forward_normal_speed + direction_normal_speed);
         rightMotor.setPower(forward_normal_speed - direction_normal_speed);
 
-
+        //both servos
         if(gamepad1.right_bumper){
-            leftServo.setPosition(0.55);
-            rightServo.setPosition(0.65);
+            //closed possition
+            leftServo.setPosition(0.35);
+            rightServo.setPosition(0.55);
         }
         if(gamepad1.left_bumper){
-            leftServo.setPosition(0.45);
-            rightServo.setPosition(0.75);
+            //open possition
+            leftServo.setPosition(0.7);
+            rightServo.setPosition(-0.05);
         }
+
+        //right servo
+        if(gamepad1.b){
+            //open rigt clow
+            rightServo.setPosition(-0.05);
+        }
+        if(gamepad1.x){
+            //close rigt clow
+            rightServo.setPosition(0.55);
+        }
+
+        //left servo
+        if(gamepad1.dpad_left){
+            //open left clow
+            leftServo.setPosition(0.7);
+        }
+        if(gamepad1.dpad_right){
+            //close left clow
+            leftServo.setPosition(0.35);
+        }
+
 
 
         double lastError = 0;
