@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="123")
+@TeleOp(name="Start")
 public class TeleOp1 extends OpMode {
 
     DcMotor leftMotor;
@@ -60,16 +60,17 @@ public class TeleOp1 extends OpMode {
         rightServo.setPosition(-0.05);
 
 
-        telemetry.addLine("Hello!");
+        telemetry.addLine("Start");
         telemetry.update();
     }
 
     @Override
     public void loop(){
 
-        double forward_normal_speed = -gamepad1.left_stick_y;
+        double forward_normal_speed = -gamepad1.right_stick_y;
         double direction_normal_speed = gamepad1.right_stick_x;
 
+        //add if triggers actioned the speed to slow or to increase
         leftMotor.setPower(forward_normal_speed + direction_normal_speed);
         rightMotor.setPower(forward_normal_speed - direction_normal_speed);
 
