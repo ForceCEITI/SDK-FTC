@@ -26,7 +26,7 @@ public class TeleOp1 extends OpMode {
     double integralSum = 0.0;
     ElapsedTime timer = new ElapsedTime();
 
-    public static double kP = 4, kI = 2, kD = 1;
+    public static double kP = 0, kI = 0, kD = 0;
     void updateMotor(double reference, double state){
         double error = reference - state;
         integralSum += error * timer.seconds();
