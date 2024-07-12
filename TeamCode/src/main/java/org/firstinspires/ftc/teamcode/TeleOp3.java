@@ -2,9 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.sun.tools.javac.jvm.ByteCodes.error;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,8 +14,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
-@TeleOp(name="Start")
-public class TeleOp1 extends OpMode {
+@TeleOp(name="Start3")
+public class TeleOp3 extends OpMode {
 
     DcMotor leftMotor;
     DcMotor rightMotor;
@@ -22,24 +23,13 @@ public class TeleOp1 extends OpMode {
 
     Servo leftServo;
     Servo rightServo;
+    private PIDController controller;
 
-
-    public static double integralSum = 0.0;
-    ElapsedTime timer = new ElapsedTime();
     public static double kP = 0, kI = 0, kD = 0;
-    public static double multiplier = 0;
-    public static double reference = 0;
 
-    void updateMotor(double reference, double state){
-        double error = reference - state;
-        integralSum += error * timer.seconds();
-        double derivative = error / timer.seconds();
-
-        double output = kP * error + kI * integralSum + kD * derivative;
-
-        timer.reset();
-        armMotor.setPower(output);
-    }
+    public static double f = 0.05;
+    public static int target = 0;
+    private final double ticks_in_degree = 1425.1;
 
     @Override
     public void init() {
@@ -60,13 +50,16 @@ public class TeleOp1 extends OpMode {
         leftServo.setPosition(0.7);
         rightServo.setPosition(-0.02);
 
+        controller = new PIDController(kP, kI, kD);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
 
         telemetry.addLine("Start");
         telemetry.update();
     }
 
     @Override
-    public void loop(){
+    public void loop() {
 
         double forward_normal_speed = -gamepad1.right_stick_y;
         double direction_normal_speed = gamepad1.right_stick_x;
@@ -74,80 +67,59 @@ public class TeleOp1 extends OpMode {
         double power_for_the_right_motor = forward_normal_speed - direction_normal_speed;
 
 
-        //add if triggers actioned the speed to slow or to increase
-        if(gamepad1.right_trigger > 0){
-            leftMotor.setPower(power_for_the_left_motor * gamepad1.right_trigger * 10);
-            rightMotor.setPower(power_for_the_right_motor * gamepad1.right_trigger * 10);
-        }
-        else{
-            leftMotor.setPower(power_for_the_left_motor);
-            rightMotor.setPower(power_for_the_right_motor);
-        }
-
+        leftMotor.setPower(power_for_the_left_motor);
+        rightMotor.setPower(power_for_the_right_motor);
 
 
         //both servos
-        if(gamepad1.right_bumper){
+        if (gamepad1.right_bumper) {
             //closed possition
-            leftServo.setPosition(0.35);
-            rightServo.setPosition(0.31);
+            leftServo.setPosition(0.5);
+            rightServo.setPosition(0.18);
         }
-        if(gamepad1.left_bumper){
+        if (gamepad1.left_bumper) {
             //open possition
             leftServo.setPosition(0.7);
             rightServo.setPosition(-0.02);
         }
 
         //right servo
-        if(gamepad1.b){
+        if (gamepad1.b) {
             //open rigt clow
             rightServo.setPosition(-0.02);
         }
-        if(gamepad1.x){
+        if (gamepad1.x) {
             //close rigt clow
-            rightServo.setPosition(0.31);
+            rightServo.setPosition(0.18);
         }
 
         //left servo
-        if(gamepad1.dpad_left){
+        if (gamepad1.dpad_left) {
             //open left clow
             leftServo.setPosition(0.7);
         }
-        if(gamepad1.dpad_right){
+        if (gamepad1.dpad_right) {
             //close left clow
-            leftServo.setPosition(0.35);
+            leftServo.setPosition(0.5);
         }
 
+        //armMotor.setPower(gamepad1.right_trigger);
+        //armMotor.setPower(-gamepad1.left_trigger);
+
+        controller.setPID(kP,kI,kD);
+        int armPos = armMotor.getCurrentPosition();
+        double pid = controller.calculate(armPos, target);
+        double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
+
+        double power = pid + ff;
+
+        armMotor.setPower(power + gamepad1.right_trigger);
+        armMotor.setPower(-gamepad1.left_trigger);
 
 
-        double lastError = 0;
-        kD = (error - lastError) / timer.seconds();
-        lastError = error;
 
-
-        if(gamepad1.circle){
-            multiplier = 50;
-        }
-        else {
-            multiplier = 10;
-        }
-
-        if(gamepad1.dpad_up){
-            reference += multiplier;
-        }
-        if(gamepad1.dpad_down){
-            reference -= multiplier;
-        }
-
-
-        if(gamepad1.cross){
-            reference = 0;
-        }
-
-        updateMotor(reference, armMotor.getCurrentPosition());
-
-        armMotor.setPower(gamepad1.left_trigger);
-
+        telemetry.addData("pos", armPos);
+        telemetry.addData("target", target);
         telemetry.update();
     }
 }
